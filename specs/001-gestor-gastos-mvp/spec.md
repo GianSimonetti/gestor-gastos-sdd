@@ -23,6 +23,16 @@ El MVP persigue cuatro resultados de negocio:
 - hacer comprensible la distribución de los gastos para apoyar la planificación del ahorro; y
 - diferenciar el dinero destinado a consumo del destinado a ahorro.
 
+## Clarifications
+
+### Session 2026-10-15
+
+- Q: En un gasto de tipo personal, ¿a quién debe asignarse el monto total? → A: Al pagador.
+- Q: ¿Qué debe mostrar el resumen mensual cuando todavía no se configuró el disponible base? → A: Mostrar el consumido y el restante como “no disponible”.
+- Q: ¿Cómo debe identificarse a un miembro con cuenta cuando se lo selecciona como pagador o participante de un gasto? → A: Con nombre visible y email para desambiguar.
+- Q: ¿Durante cuánto tiempo y cuántas veces debe poder usarse el código de invitación de un tablero? → A: Reutilizable durante 7 días.
+- Q: ¿Cuánto tiempo debe permanecer vigente un mecanismo de recuperación de contraseña antes de vencer? → A: 30 minutos desde su emisión.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Acceder de forma segura (Priority: P1)
@@ -38,9 +48,9 @@ restableciendo su contraseña mediante un mecanismo recibido por email.
 
 **Acceptance Scenarios**:
 
-1. **AC-01 / RF-01 — Registro**: **Given** un email válido no registrado y una contraseña de al
-   menos 8 caracteres, **When** la persona confirma el registro, **Then** existe exactamente una
-   cuenta asociada al email normalizado.
+1. **AC-01 / RF-01 — Registro**: **Given** un nombre visible, un email válido no registrado y una
+   contraseña de al menos 8 caracteres, **When** la persona confirma el registro, **Then** existe
+   exactamente una cuenta asociada al email normalizado y conserva el nombre visible.
 2. **AC-02 / RF-02 — Inicio de sesión**: **Given** una cuenta registrada, **When** el usuario
    ingresa su email y contraseña válidos, **Then** accede a una sesión correspondiente a esa
    cuenta.
@@ -49,7 +59,7 @@ restableciendo su contraseña mediante un mecanismo recibido por email.
    volver a acceder.
 4. **AC-04 / RF-04 — Recuperación**: **Given** una cuenta registrada con un email accesible,
    **When** el usuario solicita recuperar el acceso, **Then** recibe en ese email un mecanismo
-   vigente asociado a la cuenta.
+   de un solo uso, asociado a la cuenta y vigente durante 30 minutos desde su emisión.
 5. **AC-05 / RF-05 — Restablecimiento**: **Given** un mecanismo de recuperación vigente, **When**
    el usuario define una contraseña nueva válida, **Then** la anterior es rechazada y la nueva
    permite iniciar sesión.
@@ -73,7 +83,8 @@ incorporando una segunda cuenta, que debe poder consultar el tablero.
    **When** crea el tablero Hogar, **Then** existe exactamente un tablero con ese nombre y el
    creador figura como miembro.
 2. **AC-07 / RF-07 — Invitación**: **Given** un miembro de Hogar, **When** solicita el código de
-   invitación, **Then** ve un código asociado a ese tablero que puede compartir.
+   invitación, **Then** ve un código asociado a ese tablero, reutilizable durante 7 días desde su
+   emisión, que puede compartir.
 3. **AC-08 / RF-08 — Incorporación**: **Given** un usuario autenticado que no pertenece a Hogar y
    un código válido del tablero, **When** ingresa el código, **Then** pasa a ser miembro y puede
    consultar su listado de gastos.
@@ -349,14 +360,16 @@ seguridad y acceso definidas.
 - Un mecanismo de recuperación vencido, ya utilizado o ajeno a la cuenta no cambia la contraseña.
 - Un código de invitación inexistente o no válido no incorpora al usuario ni revela datos del
   tablero; ingresar nuevamente un código de un tablero al que ya pertenece no duplica membresías.
+- Vencido el código de invitación, deja de aceptar incorporaciones y cualquier miembro puede
+  solicitar uno nuevo; pedir el código mientras el actual sigue vigente devuelve el mismo código.
 - Dos tableros distintos pueden tener el mismo nombre; dentro de la experiencia de un usuario,
   cada tablero conserva identidad propia más allá de su nombre visible.
 - Un participante retirado no puede seleccionarse para movimientos nuevos, pero continúa
   identificado en gastos históricos.
 - Un gasto requiere nombre, monto positivo, categoría, fecha, pagador y tipo; la descripción es
   opcional. No se confirma si falta un dato obligatorio.
-- Un gasto personal asigna el total a una única persona del tablero; un gasto compartido requiere
-  al menos una persona seleccionada.
+- Un gasto personal asigna automáticamente el total al pagador y no permite seleccionar otra
+  persona; un gasto compartido requiere al menos una persona seleccionada.
 - Los importes aceptan exactamente dos decimales. Ninguna suma monetaria usa aproximaciones y las
   partes siempre suman exactamente el total del gasto.
 - En una división equitativa con centavos indivisibles, los centavos residuales se asignan uno por
@@ -366,9 +379,12 @@ seguridad y acceso definidas.
 - Cancelar una eliminación de gasto conserva el gasto y todos los totales sin cambios.
 - Un audio silencioso, ilegible, interrumpido o incompleto produce una propuesta editable con los
   campos faltantes identificados, nunca un gasto automático.
+- Si un nombre extraído del audio coincide con más de una persona del tablero, la propuesta marca
+  esa referencia como ambigua y exige que el miembro elija la persona correcta antes de confirmar.
 - Una propuesta de audio descartada o no confirmada no afecta gastos, disponible ni ahorros.
-- Un período sin disponible base se distingue de un disponible base de ARS 0,00; en ambos casos
-  los movimientos se conservan y, una vez definida la base, el restante se calcula con ellos.
+- Un período sin disponible base se distingue de un disponible base de ARS 0,00: se muestra el
+  dinero consumido, pero el restante se indica como “no disponible” hasta que un miembro configure
+  la base. Los movimientos se conservan y se incorporan al cálculo cuando se define la base.
 - El dinero restante puede ser cero o negativo y se muestra sin ocultar ni truncar el signo.
 - Editar o eliminar un movimiento fechado en otro mes recalcula el período original y, si cambia
   la fecha, también el período destino.
@@ -385,17 +401,19 @@ seguridad y acceso definidas.
 
 ### Functional Requirements
 
-- **FR-001**: El producto DEBE permitir registrar una cuenta única mediante email válido y una
-  contraseña de al menos 8 caracteres, normalizando el email para detectar duplicados.
+- **FR-001**: El producto DEBE permitir registrar una cuenta única mediante nombre visible, email
+  válido y una contraseña de al menos 8 caracteres, normalizando el email para detectar duplicados.
 - **FR-002**: El producto DEBE permitir iniciar sesión mediante email y contraseña válidos.
 - **FR-003**: El producto DEBE permitir cerrar la sesión activa e impedir acceso posterior a datos
   protegidos sin una nueva autenticación.
-- **FR-004**: El producto DEBE enviar al email de una cuenta un mecanismo de recuperación vigente,
-  de uso único y con vencimiento.
+- **FR-004**: El producto DEBE enviar al email de una cuenta un mecanismo de recuperación de uso
+  único que venza 30 minutos después de su emisión.
 - **FR-005**: El producto DEBE permitir reemplazar la contraseña mediante un mecanismo de
   recuperación válido e invalidar la contraseña anterior.
 - **FR-006**: Un usuario autenticado DEBE poder crear un tablero y quedar incorporado como miembro.
-- **FR-007**: Todo miembro DEBE poder obtener un código de invitación asociado a su tablero.
+- **FR-007**: Todo miembro DEBE poder obtener el código de invitación vigente de su tablero. El
+  código DEBE poder usarse varias veces durante 7 días calendario desde su emisión; vencido ese
+  plazo, cualquier miembro DEBE poder obtener uno nuevo.
 - **FR-008**: Un usuario autenticado DEBE poder incorporarse una sola vez a un tablero mediante un
   código de invitación válido.
 - **FR-009**: Todo miembro DEBE poder registrar un participante sin cuenta en su tablero.
@@ -407,7 +425,8 @@ seguridad y acceso definidas.
   categoría, fecha, pagador, tipo y descripción opcional.
 - **FR-013**: Si no se indica fecha, el gasto DEBE usar la fecha calendario vigente en Argentina.
 - **FR-014**: Cada gasto DEBE conservar uno de tres tipos: personal, compartido en partes iguales o
-  compartido con distribución personalizada.
+  compartido con distribución personalizada. El tipo personal DEBE asignar automáticamente el
+  monto total al pagador y no generar deuda del pagador consigo mismo.
 - **FR-015**: La división equitativa DEBE asignar el monto total entre las personas seleccionadas
   con diferencias máximas de un centavo.
 - **FR-016**: Los residuos de la división equitativa DEBEN asignarse de forma repetible, un centavo
@@ -443,8 +462,10 @@ seguridad y acceso definidas.
 - **FR-035**: El dinero consumido de un período DEBE ser la suma exacta de los montos totales de
   gastos y los importes en ARS de compras de USD fechados en ese período, sin usar las partes para
   reducir o duplicar el total.
-- **FR-036**: El dinero restante DEBE ser el disponible base menos el dinero consumido y DEBE
-  admitir resultados negativos.
+- **FR-036**: Cuando existe un disponible base, el dinero restante DEBE ser el disponible base
+  menos el dinero consumido y DEBE admitir resultados negativos. Cuando no existe, el producto
+  DEBE seguir mostrando el consumido y marcar el restante como “no disponible”, sin asumir ni
+  crear una base de ARS 0,00.
 - **FR-037**: Todo miembro DEBE poder registrar un único ahorro inicial en USD por tablero.
 - **FR-038**: Todo miembro DEBE poder editar el ahorro inicial sin crear registros iniciales
   duplicados.
@@ -501,14 +522,16 @@ MVP se limita a facilitar la propuesta revisable de un gasto desde audio.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Cuenta**: Identidad de una persona usuaria; posee un email único, credencial protegida y
-  mecanismos de sesión y recuperación.
+- **Cuenta**: Identidad de una persona usuaria; posee un nombre visible, un email único, credencial
+  protegida y mecanismos de sesión y recuperación. Al seleccionar personas se muestra el nombre y,
+  cuando existen homónimos, también el email para desambiguarlas.
 - **Tablero**: Contenedor colaborativo de membresías, participantes, gastos, disponibles mensuales
   y ahorros; constituye el límite de autorización y propiedad de datos.
 - **Membresía**: Relación única entre una cuenta y un tablero; todos sus miembros tienen las mismas
   capacidades en el MVP.
-- **Código de invitación**: Valor compartible asociado a un tablero que permite incorporar una
-  cuenta autenticada como miembro.
+- **Código de invitación**: Valor compartible asociado a un tablero que permite incorporar cuentas
+  autenticadas como miembros varias veces durante los 7 días calendario posteriores a su emisión.
+  El tablero mantiene un único código vigente y, al vencer, un miembro puede obtener uno nuevo.
 - **Participante sin cuenta**: Persona representada sólo dentro de un tablero; puede pagar o recibir
   partes, no puede autenticarse y puede retirarse de operaciones futuras sin perder su historial.
 - **Gasto**: Movimiento en ARS con nombre, monto total, categoría, fecha, pagador, tipo,
@@ -561,8 +584,7 @@ MVP se limita a facilitar la propuesta revisable de un gasto desde audio.
 - Un participante sin cuenta nunca accede al producto y sólo existe dentro del tablero donde fue
   creado.
 - Una contraseña válida tiene al menos 8 caracteres. El mecanismo de recuperación es personal,
-  temporal y de un solo uso; su duración concreta se definirá como política operativa sin cambiar
-  el flujo especificado.
+  válido durante 30 minutos desde su emisión y de un solo uso.
 - Los centavos residuales de una división equitativa se asignan según el orden estable de selección
   de personas, comenzando por la primera.
 - Las categorías disponibles forman un catálogo básico suficiente para registrar y agrupar
