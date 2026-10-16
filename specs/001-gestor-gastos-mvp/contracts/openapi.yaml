@@ -365,7 +365,7 @@ paths:
         - $ref: "#/components/parameters/PageSize"
       responses:
         "200":
-          description: Paginated expenses ordered by date descending, then creation descending
+          description: Paginated expenses ordered by date descending, creation descending, then ID ascending
           content:
             application/json:
               schema:
@@ -468,7 +468,7 @@ paths:
                 audio:
                   type: string
                   format: binary
-                  description: Supported webm, mp4, m4a, mp3, ogg or wav; max 15 MB and 60 seconds
+                  description: Supported WAV, MP3, M4A/MP4, WebM or Ogg; max 15 MB and 60 seconds
       responses:
         "200":
           description: Editable transient proposal; no expense has been created
@@ -618,7 +618,7 @@ paths:
         - $ref: "#/components/parameters/PageSize"
       responses:
         "200":
-          description: Paginated USD purchases
+          description: Paginated USD purchases ordered by purchase date descending, creation descending, then ID ascending
           content:
             application/json:
               schema:
@@ -929,6 +929,7 @@ components:
     Category:
       type: string
       enum: [food, transport, housing, services, health, education, leisure, other]
+      description: Alimentos, Transporte, Vivienda, Servicios, Salud, Educación, Ocio y Otros, respectivamente
     CustomShareInput:
       type: object
       required: [person_id, amount_ars]

@@ -33,7 +33,8 @@ TypeScript
 audio sólo temporales durante el procesamiento
 
 **Testing**: pytest para dominio, aplicación, persistencia, contratos HTTP, seguridad, evaluación
-de audio y prueba opt-in de rendimiento; build de frontend y validación manual de la matriz móvil
+de audio y prueba opt-in de rendimiento; build de frontend, validación manual de la matriz móvil y
+evaluación de usabilidad sin asistencia con cinco usuarios representativos
 
 **Target Platform**: Aplicación web responsive; backend en un único proceso/instancia; frontend
 compatible con Safari en iOS 14 a 390 × 844 y Chrome en Android 12 a 360 × 800
@@ -45,12 +46,20 @@ completados en 4 segundos o menos tras 10 solicitudes de calentamiento en 2 vCPU
 
 **Constraints**: Cálculos monetarios sin `float`; autorización backend por tablero; exactitud y
 residuos deterministas; propuesta de audio nunca auto-confirmada; cero credenciales en texto plano;
-sin bancos, billeteras, apps nativas, conversión USD/ARS, roles ni liquidación de deudas
+sin bancos, billeteras, apps nativas, conversión USD/ARS, roles ni liquidación de deudas. El catálogo
+cerrado usa los códigos `food`, `transport`, `housing`, `services`, `health`, `education`, `leisure`
+y `other`, presentados como Alimentos, Transporte, Vivienda, Servicios, Salud, Educación, Ocio y
+Otros.
 
 **Scale/Scope**: MVP de una sola instancia con SQLite. El único compromiso de concurrencia es el
 objetivo explícito de 5 inicios de sesión simultáneos; no se diseña escalado horizontal ni una
-plataforma multi-servicio. Los listados se paginan desde el inicio para evitar acoplar el contrato
-al volumen real.
+plataforma multi-servicio. Los listados de gastos se ordenan por fecha descendente, creación
+descendente e ID ascendente; las compras de USD usan el mismo criterio con su fecha de compra. Ambos
+se paginan desde el inicio para evitar acoplar el contrato al volumen real.
+
+**Audio inputs**: Se admiten contenedores WAV, MP3, M4A/MP4, WebM y Ogg hasta 60 segundos y 15 MB.
+Los demás se rechazan antes de transcribir. Los 20 archivos consentidos y no sensibles del corpus,
+su manifiesto, hashes y valores esperados se congelan antes de implementar o ajustar el extractor.
 
 ## Constitution Check
 

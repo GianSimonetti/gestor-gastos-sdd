@@ -104,7 +104,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T036 [US2] Map Board (`id`: "Immutable primary key"; `name`: "Trimmed, 1–100 characters; need not be globally unique"; `created_at`: "Creation instant"), Membership (`id`: "Primary key"; `board_id`: "FK to Board"; `user_id`: "FK to User"; `joined_at`: "Creation/join instant"; unique `(board_id, user_id)`), BoardPerson (`id`: "Primary key"; `board_id`: "FK to Board; part of board-scope constraints"; `kind`: "account or guest"; `user_id`: "Required and unique per board for account; null for guest"; `guest_name`: "Required, trimmed 1–100 chars for guest; null for account"; `active`: "Defaults true; account persons remain active while membership exists"; `version`: "Optimistic concurrency token"; `created_at`: "Creation instant"; `retired_at`: "Set only when a guest is retired" when present), and BoardInvitationState (`board_id`: "PK/FK to Board; one-to-one"; `nonce`: "Rotated after expiry"; `issued_at`: "Start of validity"; `expires_at`: "Seven calendar days after issue"; `version`: "Protects concurrent rotation") in `backend/app/db/models.py`
 - [ ] T037 [P] [US2] Define board, invitation and join schemas matching the OpenAPI decimal-free board contracts in `backend/app/api/schemas/boards.py`
 - [ ] T038 [US2] Implement atomic board creation, board listing/detail, membership checks, stable invitation retrieval/rotation and idempotent joining in `backend/app/application/board_service.py`
-- [ ] T039 [US2] Implement `/boards`, `/boards/join`, `/boards/{boardId}` and `/boards/{boardId}/invitation-code` in `backend/app/api/routers/boards.py`
+- [ ] T039 [US2] Implement `/boards`, `/boards/join`, `/boards/{boardId}` and `/boards/{boardId}/invitation-code`, then register the board router in the app factory in `backend/app/api/routers/boards.py` and `backend/app/main.py`
 - [ ] T040 [P] [US2] Implement board API calls and selected-board context in `frontend/src/features/boards/api.js` and `frontend/src/features/boards/BoardContext.jsx`
 - [ ] T041 [P] [US2] Build board list/create/join views with invalid and expired-code feedback in `frontend/src/pages/BoardsPage.jsx`
 - [ ] T042 [P] [US2] Build the board header and invitation-code sharing panel with expiry display in `frontend/src/features/boards/BoardHeader.jsx` and `frontend/src/features/boards/InvitationPanel.jsx`
@@ -130,7 +130,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T046 [US3] Add database invariants for BoardPerson so account requires unique-per-board `user_id` and null `guest_name`, guest requires null `user_id` and "Required, trimmed 1–100 chars" `guest_name`, retired guests set `retired_at`, and no reactivation path exists in `backend/app/db/models.py`
 - [ ] T047 [P] [US3] Define people schemas that expose stable IDs, active state, kind and account email only for disambiguation in `backend/app/api/schemas/people.py`
 - [ ] T048 [US3] Implement authorized guest creation, rename and retirement plus active-choice and historical lookup semantics in `backend/app/application/board_service.py`
-- [ ] T049 [US3] Implement `/boards/{boardId}/people` and `/boards/{boardId}/people/{personId}` operations with version conflicts in `backend/app/api/routers/people.py`
+- [ ] T049 [US3] Implement `/boards/{boardId}/people` and `/boards/{boardId}/people/{personId}` operations with version conflicts, then register the people router in `backend/app/api/routers/people.py` and `backend/app/main.py`
 - [ ] T050 [US3] Build participant list/create/rename/retire UI and reusable person selector labels in `frontend/src/features/people/PeoplePanel.jsx` and `frontend/src/features/people/PersonSelect.jsx`
 
 **Checkpoint**: Guest participant lifecycle is independently usable and historical references remain stable.
@@ -155,9 +155,9 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T055 [US4] Map Expense (`id`: "Primary key"; `board_id`: "FK to Board; indexed with expense_date"; `name`: "Trimmed, 1–150 characters"; `amount_ars_cents`: "Greater than 0"; `category`: `food|transport|housing|services|health|education|leisure|other`; `expense_date`: "Supplied or defaulted in Argentina timezone"; `payer_person_id`: "Active BoardPerson in same board at creation/edit"; `expense_type`: `personal|equal|custom`; `description`: "Trimmed; maximum 1000 characters" when present; `version`: "Optimistic concurrency token"; `created_at`: "Creation instant"; `updated_at`: "Last successful update") and ExpenseShare (`id`: "Primary key"; `expense_id`: "FK to Expense; cascade on expense deletion"; `board_id`: "Matches Expense and BoardPerson board"; `person_id`: "FK to BoardPerson in same board"; `amount_ars_cents`: "Greater than or equal to 0"; `selection_order`: "Zero-based, unique inside expense"; unique `(expense_id, person_id)` and `(expense_id, selection_order)`) in `backend/app/db/models.py`
 - [ ] T056 [P] [US4] Define expense input/output, exact share, debt, category and type schemas using canonical decimal strings in `backend/app/api/schemas/expenses.py`
 - [ ] T057 [US4] Implement authorized atomic expense creation, domain validation, person lookup and derived share/debt presentation in `backend/app/application/expense_service.py`
-- [ ] T058 [US4] Implement POST `/boards/{boardId}/expenses` and the initial GET detail operation in `backend/app/api/routers/expenses.py`
+- [ ] T058 [US4] Implement POST `/boards/{boardId}/expenses` and the initial GET detail operation, then register the expenses router in `backend/app/api/routers/expenses.py` and `backend/app/main.py`
 - [ ] T059 [P] [US4] Implement the shared manual/audio expense draft reducer without authoritative calculations in `frontend/src/features/expenses/expenseDraftReducer.js`
-- [ ] T060 [P] [US4] Build the responsive expense form for all fields/types with ordered participants, exact custom shares and field-associated errors in `frontend/src/features/expenses/ExpenseForm.jsx`
+- [ ] T060 [P] [US4] Build the responsive expense form for all fields/types with ordered participants, exact custom shares, field-associated errors and the fixed labels Alimentos, Transporte, Vivienda, Servicios, Salud, Educación, Ocio and Otros mapped to contract codes in `frontend/src/features/expenses/ExpenseForm.jsx`
 - [ ] T061 [P] [US4] Build exact share and debt presentation in `frontend/src/features/expenses/ExpenseDistribution.jsx`
 - [ ] T062 [US4] Expose new-expense entry from the board home in one interaction and wire successful creation/reload in `frontend/src/pages/BoardPage.jsx` and `frontend/src/pages/NewExpensePage.jsx`
 
@@ -173,7 +173,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 
 ### Tests for User Story 5 — write and observe failure first
 
-- [ ] T063 [P] [US5] Write failing integration tests for paginated/ordered queries, atomic share replacement, stale update/delete conflicts and cascade deletion in `backend/tests/integration/test_expense_mutations.py`
+- [ ] T063 [P] [US5] Write failing integration tests for paginated queries ordered by expense date descending, creation instant descending and ID ascending, plus atomic share replacement, stale update/delete conflicts and cascade deletion in `backend/tests/integration/test_expense_mutations.py`
 - [ ] T064 [P] [US5] Write failing API tests for list/detail/update/delete contracts, confirmation-version input, pagination bounds and unavailable foreign-board IDs in `backend/tests/api/test_expense_crud.py`
 
 ### Implementation for User Story 5
@@ -208,7 +208,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T076 [US7] Map MonthlyBudget (`id`: "Primary key"; `board_id`: "FK to Board"; `year`: "Four-digit supported calendar year"; `month`: "1–12"; `base_ars_cents`: "Greater than or equal to 0"; `version`: "Optimistic concurrency token"; `created_at`: "Creation instant"; `updated_at`: "Last update"; unique `(board_id, year, month)`) in `backend/app/db/models.py`
 - [ ] T077 [P] [US7] Define monthly budget and summary schemas with `remaining_ars` nullable when no base exists in `backend/app/api/schemas/monthly.py`
 - [ ] T078 [US7] Implement authorized versioned budget upsert and on-demand monthly summary queries in `backend/app/application/monthly_service.py`
-- [ ] T079 [US7] Implement `/boards/{boardId}/months/{month}/budget` and `/boards/{boardId}/months/{month}/summary` in `backend/app/api/routers/monthly.py`
+- [ ] T079 [US7] Implement `/boards/{boardId}/months/{month}/budget` and `/boards/{boardId}/months/{month}/summary`, then register the monthly router in `backend/app/api/routers/monthly.py` and `backend/app/main.py`
 - [ ] T080 [US7] Build month selection, budget editing, textual/category-bar summary and explicit “no disponible”/negative states in `frontend/src/features/monthly/MonthlyDashboard.jsx` and `frontend/src/features/monthly/CategoryBars.jsx`
 
 **Checkpoint**: Monthly control is independently usable and remains exact after current expense mutations.
@@ -223,9 +223,9 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 
 ### Tests for User Story 6 — write and observe failure first
 
-- [ ] T081 [P] [US6] Write failing unit tests for deterministic Argentine amount/date/category/type/person extraction, homonym ambiguities and explicit missing fields in `backend/tests/unit/test_speech_extractor.py`
-- [ ] T082 [P] [US6] Write failing service tests with a fake transcriber for 60-second/15-MB limits, cleanup after success/failure and no proposal persistence in `backend/tests/unit/test_audio_service.py`
-- [ ] T083 [P] [US6] Write failing API tests for multipart audio proposals, formats/errors, membership denial and confirmation only through POST expenses in `backend/tests/api/test_audio.py`
+- [ ] T081 [US6] Before implementing or tuning extraction, add and freeze exactly 20 consented, non-sensitive Argentine Spanish audio files plus expected present fields and SHA-256 hashes in `backend/tests/fixtures/audio-eval/` and `backend/tests/fixtures/audio-eval/manifest.json`
+- [ ] T082 [P] [US6] Write failing tests for deterministic Argentine amount/date/category/type/person extraction, homonym ambiguities, explicit missing fields, 60-second/15-MB limits, cleanup after success/failure and no proposal persistence in `backend/tests/unit/test_speech_extractor.py` and `backend/tests/unit/test_audio_service.py`
+- [ ] T083 [P] [US6] Write failing API tests for WAV, MP3, M4A/MP4, WebM and Ogg acceptance; other-container rejection; multipart errors; membership denial; and confirmation only through POST expenses in `backend/tests/api/test_audio.py`
 
 ### Implementation for User Story 6
 
@@ -233,7 +233,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T085 [P] [US6] Implement the pure repeatable transcript extractor for the fixed catalog, monetary expressions, dates, expense type and board-person candidates in `backend/app/infrastructure/speech_extractor.py`
 - [ ] T086 [P] [US6] Define transient AudioProposal fields (`transcript`: "Used for review; not logged or persisted"; extracted optional `name`; canonical optional `amount_ars`; fixed-catalog optional `category`; `expense_date`: "Extracted/defaulted only when unambiguous"; extracted optional `description`/`expense_type`; `payer_person_id`: "Only when exactly matched in board context"; stable-order optional `participant_person_ids`; optional `custom_shares`; required `missing_fields`, `ambiguities`, and `warnings`) without any persistence model in `backend/app/api/schemas/audio.py`
 - [ ] T087 [US6] Implement authorized temporary-file validation, transcription, extraction and `finally` cleanup without logging audio/transcripts in `backend/app/application/audio_service.py`
-- [ ] T088 [US6] Implement multipart POST `/boards/{boardId}/audio-proposals` with 15-MB/60-second and supported-format responses in `backend/app/api/routers/audio.py`
+- [ ] T088 [US6] Implement multipart POST `/boards/{boardId}/audio-proposals` with 15-MB/60-second limits and WAV, MP3, M4A/MP4, WebM and Ogg allowlisting, then register the audio router in `backend/app/api/routers/audio.py` and `backend/app/main.py`
 - [ ] T089 [P] [US6] Build MediaRecorder capture with visible requesting/recording/processing/error states, track cleanup and file-input fallback in `frontend/src/features/audio/AudioCapture.jsx`
 - [ ] T090 [P] [US6] Build proposal review using the shared expense draft reducer, marking missing/ambiguous fields and permitting every field to be edited in `frontend/src/features/audio/AudioProposalReview.jsx`
 - [ ] T091 [US6] Wire audio proposal confirmation to the normal expense creation API and cancellation to discard local state in `frontend/src/pages/AudioExpensePage.jsx` and `frontend/src/app/router.jsx`
@@ -252,7 +252,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 
 - [ ] T092 [P] [US8] Write failing unit tests for USD total derivation and strict separation of USD quantities from ARS monthly consumption in `backend/tests/unit/test_savings.py`
 - [ ] T093 [P] [US8] Write failing integration tests for single InitialSavings lifecycle, UsdPurchase persistence, Argentina default date, month movement, deletion and version conflicts in `backend/tests/integration/test_savings.py`
-- [ ] T094 [P] [US8] Write failing API tests for savings summary, initial upsert/delete, paginated monthly purchases, purchase CRUD and cross-board denial in `backend/tests/api/test_savings.py`
+- [ ] T094 [P] [US8] Write failing API tests for savings summary, initial upsert/delete, purchase CRUD, cross-board denial and paginated monthly purchases ordered by purchase date descending, creation instant descending and ID ascending in `backend/tests/api/test_savings.py`
 
 ### Implementation for User Story 8
 
@@ -260,7 +260,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T096 [US8] Map InitialSavings (`board_id`: "PK/FK to Board; enforces one current record"; `amount_usd_cents`: "Greater than or equal to 0"; `version`: "Optimistic concurrency token"; `created_at`: "Creation instant"; `updated_at`: "Last update") and UsdPurchase (`id`: "Primary key"; `board_id`: "FK to Board; indexed with purchase_date"; `amount_usd_cents`: "Greater than 0"; `ars_spent_cents`: "Greater than 0"; `purchase_date`: "Supplied or defaulted in Argentina timezone"; `version`: "Optimistic concurrency token"; `created_at`: "Creation instant"; `updated_at`: "Last update") in `backend/app/db/models.py`
 - [ ] T097 [P] [US8] Define savings, purchase and paginated monthly response schemas with canonical USD/ARS strings in `backend/app/api/schemas/savings.py`
 - [ ] T098 [US8] Implement authorized initial-savings lifecycle, purchase CRUD/filtering and derived totals using scoped repositories in `backend/app/application/savings_service.py`
-- [ ] T099 [US8] Implement `/boards/{boardId}/savings`, `/savings/initial`, `/usd-purchases` and `/usd-purchases/{purchaseId}` operations in `backend/app/api/routers/savings.py`
+- [ ] T099 [US8] Implement `/boards/{boardId}/savings`, `/savings/initial`, `/usd-purchases` and `/usd-purchases/{purchaseId}` operations, then register the savings router in `backend/app/api/routers/savings.py` and `backend/app/main.py`
 - [ ] T100 [P] [US8] Implement savings API calls with version conflict reload in `frontend/src/features/savings/api.js`
 - [ ] T101 [P] [US8] Build initial savings and total cards with create/edit/delete states in `frontend/src/features/savings/InitialSavingsCard.jsx`
 - [ ] T102 [P] [US8] Build purchase list/month filter and exact USD/ARS purchase form in `frontend/src/features/savings/UsdPurchasePanel.jsx`
@@ -299,17 +299,17 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 ### Tests and evidence for User Story 10
 
 - [ ] T108 [P] [US10] Write an end-to-end persistence test that recreates the engine and verifies account, membership, guest, expense/shares, monthly budget, initial savings and USD purchase values in `backend/tests/integration/test_restart_persistence.py`
-- [ ] T109 [P] [US10] Create the consented 20-case Argentine Spanish audio manifest with SHA-256 hashes and expected present fields in `backend/tests/fixtures/audio-eval/manifest.json`
+- [ ] T109 [P] [US10] Write a corpus-integrity test that requires exactly 20 audio files, verifies every SHA-256 hash against the manifest and rejects missing/unlisted fixtures in `backend/tests/test_audio_corpus.py`
 - [ ] T110 [US10] Implement the opt-in all-fields-match audio evaluation gate with a 12/20 threshold in `backend/tests/test_audio_evaluation.py`
 - [ ] T111 [P] [US10] Implement the opt-in 10-warmup/100-login/concurrency-5 performance gate and percentile/result reporting for the fixed 2-vCPU/4-GB environment in `backend/tests/performance/test_login.py`
 - [ ] T112 [P] [US10] Write security regression tests that scan persisted auth fields and captured logs for passwords, JWTs, raw reset/invitation codes, full emails, audio and transcripts in `backend/tests/integration/test_secret_exposure.py`
 
 ### Implementation for User Story 10
 
-- [ ] T113 [P] [US10] Add reusable accessible form-error summary, first-invalid-field focus and 44×44-pixel control primitives in `frontend/src/components/FormErrorSummary.jsx` and `frontend/src/styles/accessibility.css`
-- [ ] T114 [P] [US10] Harden responsive layouts at 360, 390, 768 and 1280 CSS pixels without horizontal page scrolling or clipped actions in `frontend/src/styles/responsive.css`
-- [ ] T115 [US10] Apply semantic labels, keyboard/focus behavior, textual chart equivalents and visible loading/empty/error states across all routes listed in `frontend/src/app/router.jsx`
-- [ ] T116 [US10] Record the five-user unassisted usability protocol and result template for shared expense, monthly remaining and audio review flows in `specs/001-gestor-gastos-mvp/usability-validation.md`
+- [ ] T113 [P] [US10] Add reusable field-associated error summaries and operable form-control styles for the approved mobile matrix in `frontend/src/components/FormErrorSummary.jsx` and `frontend/src/styles/accessibility.css`
+- [ ] T114 [P] [US10] Harden responsive layouts at 360×800 and 390×844 CSS pixels in portrait at 100% zoom without horizontal page scrolling, clipped content or inaccessible controls in `frontend/src/styles/responsive.css`
+- [ ] T115 [US10] Ensure every route in the approved mobile matrix exposes reachable controls, visible loading/empty/error states and a textual category/amount equivalent for category bars in `frontend/src/app/router.jsx`
+- [ ] T116 [US10] Define the protocol, conduct the unassisted evaluation with exactly five representative users, record anonymous per-flow results and calculate whether at least four completed shared expense, monthly remaining and audio review in `specs/001-gestor-gastos-mvp/usability-validation.md`
 
 **Checkpoint**: The complete product has reproducible evidence for NFR-001–NFR-006 and SC-004–SC-010.
 
@@ -323,7 +323,7 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 - [ ] T118 [P] Review dependencies and configuration for unrequested services, hardcoded secrets and prohibited financial integrations, documenting findings in `specs/001-gestor-gastos-mvp/security-review.md`
 - [ ] T119 Run `uv run pytest -m "not audio_eval and not performance"`, then the explicit audio/performance gates, and record exact commands/results in `specs/001-gestor-gastos-mvp/validation-results.md`
 - [ ] T120 Run `npm run build` and record the production build result in `specs/001-gestor-gastos-mvp/validation-results.md`
-- [ ] T121 Execute every end-to-end scenario in `quickstart.md`, including Safari iOS 14 at 390×844 and Chrome Android 12 at 360×800, and record evidence in `specs/001-gestor-gastos-mvp/validation-results.md`
+- [ ] T121 Execute every end-to-end scenario in `quickstart.md`, including Safari iOS 14 at 390×844 and Chrome Android 12 at 360×800, reference the existing T116 five-user evidence without repeating that study, and record results in `specs/001-gestor-gastos-mvp/validation-results.md`
 - [ ] T122 Reconcile implemented routes and schemas with `specs/001-gestor-gastos-mvp/contracts/openapi.yaml` and document any approved spec correction before release in `specs/001-gestor-gastos-mvp/validation-results.md`
 
 ---
@@ -422,8 +422,9 @@ T077 schemas | T080 dashboard after the contract is stable
 ### Parallel Example: US6
 
 ```text
-T081 extractor tests | T082 audio service tests | T083 audio API tests
-T084 transcription adapter | T085 extractor | T086 schemas | T089 capture UI | T090 review UI
+T081 freezes the corpus before any extractor work
+After T081: T082 extractor/service tests | T083 audio API tests
+After failing tests: T084 transcription adapter | T085 extractor | T086 schemas | T089 capture UI | T090 review UI
 ```
 
 ### Parallel Example: US8
@@ -442,7 +443,7 @@ T104 complete HTTP isolation matrix | T105 repository scoping matrix
 ### Parallel Example: US10
 
 ```text
-T108 restart persistence | T109 audio manifest | T111 login performance | T112 secret exposure
+T108 restart persistence | T109 corpus integrity | T111 login performance | T112 secret exposure
 T113 accessibility primitives | T114 responsive styles
 ```
 

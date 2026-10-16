@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-15
 
-**Status**: Draft
+**Status**: Design Complete
 
 **Input**: User description: "Generar el spec de Gestor Gastos a partir del PRD.md completo, con historias de usuario, escenarios y criterios de aceptación verificables, casos borde y criterios de éxito, sin decisiones técnicas ni implementación."
 
@@ -343,8 +343,10 @@ seguridad y acceso definidas.
 3. **AC-57 / NFR-03 — Adaptabilidad**: **Given** cada pantalla cubierta por estos criterios,
    **When** se usa en la matriz objetivo, **Then** el 100% opera sin desplazamiento horizontal,
    contenido cortado ni controles inaccesibles.
-4. **AC-58 / NFR-04 — Audio**: **Given** el conjunto fijo de 20 audios definido antes de la
-   prueba, **When** se procesan todos, **Then** al menos 12 coinciden en todos los valores esperados.
+4. **AC-58 / NFR-04 — Audio**: **Given** el conjunto fijo de 20 audios consentidos y no sensibles,
+   con manifiesto, hashes y valores esperados, congelado antes de implementar o ajustar las reglas
+   de extracción, **When** se procesan todos, **Then** al menos 12 coinciden en todos los valores
+   esperados presentes.
 5. **AC-59 / NFR-05 — Credenciales**: **Given** cuentas registradas y sesiones iniciadas,
    **When** se inspeccionan las credenciales almacenadas o expuestas, **Then** se encuentran cero
    credenciales de autenticación en texto plano.
@@ -422,7 +424,8 @@ seguridad y acceso definidas.
 - **FR-011**: Todo miembro DEBE poder retirar un participante sin cuenta de operaciones futuras sin
   eliminarlo de gastos históricos.
 - **FR-012**: Todo miembro DEBE poder registrar un gasto con nombre, monto total positivo en ARS,
-  categoría, fecha, pagador, tipo y descripción opcional.
+  categoría, fecha, pagador, tipo y descripción opcional. El catálogo cerrado del MVP DEBE contener
+  Alimentos, Transporte, Vivienda, Servicios, Salud, Educación, Ocio y Otros.
 - **FR-013**: Si no se indica fecha, el gasto DEBE usar la fecha calendario vigente en Argentina.
 - **FR-014**: Cada gasto DEBE conservar uno de tres tipos: personal, compartido en partes iguales o
   compartido con distribución personalizada. El tipo personal DEBE asignar automáticamente el
@@ -437,14 +440,18 @@ seguridad y acceso definidas.
 - **FR-019**: El detalle del gasto DEBE mostrar la parte exacta asignada a cada persona.
 - **FR-020**: Para cada persona distinta del pagador, el producto DEBE calcular como deuda con el
   pagador su parte asignada; la parte del pagador no genera deuda consigo mismo.
-- **FR-021**: Todo miembro DEBE poder consultar el listado de gastos de su tablero.
+- **FR-021**: Todo miembro DEBE poder consultar el listado de gastos de su tablero, ordenado por
+  fecha descendente, luego por instante de creación descendente y finalmente por identificador
+  ascendente como desempate estable.
 - **FR-022**: Todo miembro DEBE poder consultar nombre, monto, categoría, descripción si existe,
   fecha, pagador, tipo, distribución y deudas de un gasto.
 - **FR-023**: Todo miembro DEBE poder editar un gasto y el producto DEBE recalcular sus partes,
   deudas, agrupaciones y totales mensuales afectados.
 - **FR-024**: Todo miembro DEBE poder eliminar un gasto sólo después de confirmar la operación; la
   eliminación DEBE actualizar todos los totales afectados.
-- **FR-025**: Todo miembro DEBE poder iniciar y reconocer el estado de una captura de audio.
+- **FR-025**: Todo miembro DEBE poder iniciar y reconocer el estado de una captura de audio y usar
+  archivos WAV, MP3, M4A/MP4, WebM u Ogg; cualquier otro contenedor DEBE rechazarse antes del
+  procesamiento sin crear una propuesta ni un gasto.
 - **FR-026**: El producto DEBE intentar extraer del audio nombre, monto, categoría, fecha,
   descripción, tipo, pagador y participantes cuando estén expresados.
 - **FR-027**: El procesamiento de audio DEBE generar una propuesta de gasto sin registrarla.
@@ -482,7 +489,8 @@ seguridad y acceso definidas.
 - **FR-045**: El total de ahorros DEBE ser el ahorro inicial vigente más las cantidades en USD de
   todas las compras vigentes del tablero.
 - **FR-046**: Todo miembro DEBE poder consultar las compras de USD y su total en USD filtrados por
-  período mensual.
+  período mensual, ordenados por fecha de compra descendente, luego por instante de creación
+  descendente y finalmente por identificador ascendente como desempate estable.
 - **FR-047**: Toda lectura, creación, modificación o eliminación de recursos de un tablero DEBE
   exigir que el usuario sea miembro de ese tablero; un rechazo no debe revelar datos ni cambiar
   el estado.
@@ -503,8 +511,10 @@ seguridad y acceso definidas.
   operable, en orientación vertical y zoom del 100%, a 390 × 844 píxeles en Safari sobre iOS 14 y
   a 360 × 800 píxeles en Chrome sobre Android 12, sin desplazamiento horizontal, contenido
   cortado ni controles inaccesibles.
-- **NFR-004 — Precisión de audio**: Al menos 12 de 20 audios de un conjunto fijo, definido antes de
-  la prueba en español de Argentina, DEBEN coincidir en todos los valores esperados presentes.
+- **NFR-004 — Precisión de audio**: Al menos 12 de 20 audios consentidos y no sensibles de un
+  conjunto fijo en español de Argentina DEBEN coincidir en todos los valores esperados presentes.
+  Los 20 archivos, su manifiesto, hashes y valores esperados DEBEN quedar congelados antes de
+  implementar o ajustar las reglas de extracción.
 - **NFR-005 — Protección de credenciales**: La cantidad de credenciales de autenticación
   almacenadas o expuestas en texto plano DEBE ser cero.
 - **NFR-006 — Inicio de sesión oportuno**: En 100 intentos válidos con 5 usuarios concurrentes,
@@ -561,8 +571,10 @@ MVP se limita a facilitar la propuesta revisable de un gasto desde audio.
   miembro es rechazado sin exponer datos ni alterar el recurso.
 - **SC-004**: El 100% de los datos confirmados del conjunto de persistencia conserva sus valores
   después de un reinicio.
-- **SC-005**: Al menos 12 de 20 audios del conjunto fijo de evaluación coinciden en todos los datos
-  relevantes esperados y el 100% de las propuestas requiere confirmación antes de crear un gasto.
+- **SC-005**: El conjunto fijo contiene exactamente 20 archivos de audio consentidos y no sensibles
+  cuyos hashes coinciden con el manifiesto congelado antes de implementar o ajustar la extracción;
+  al menos 12 coinciden en todos los datos relevantes esperados y el 100% de las propuestas
+  requiere confirmación antes de crear un gasto.
 - **SC-006**: El 100% de las pantallas evaluadas en la matriz móvil definida puede operarse sin
   desplazamiento horizontal, contenido cortado ni controles inaccesibles.
 - **SC-007**: Abrir la carga de un gasto desde la pantalla principal requiere como máximo una
@@ -587,8 +599,8 @@ MVP se limita a facilitar la propuesta revisable de un gasto desde audio.
   válido durante 30 minutos desde su emisión y de un solo uso.
 - Los centavos residuales de una división equitativa se asignan según el orden estable de selección
   de personas, comenzando por la primera.
-- Las categorías disponibles forman un catálogo básico suficiente para registrar y agrupar
-  gastos; crear una gestión avanzada de categorías queda fuera de alcance.
+- Las categorías disponibles son Alimentos, Transporte, Vivienda, Servicios, Salud, Educación,
+  Ocio y Otros; crear, editar, eliminar o reordenar categorías queda fuera de alcance.
 - La eliminación de participantes conserva referencias históricas; la eliminación de gastos y
   compras elimina el movimiento de consultas y cálculos vigentes tras una confirmación aplicable.
 - El procesamiento de audio y el envío de recuperaciones por email son dependencias externas al

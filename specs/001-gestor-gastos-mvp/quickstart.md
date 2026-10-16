@@ -79,8 +79,9 @@ Required test groups:
    recreated engine, membership/person identity, cross-board isolation and stale-version conflicts.
 3. `tests/api`: request/response shapes, cookie JWT lifecycle, password recovery, invitation code,
    CRUD flows, pagination, audio proposal separation and uniform errors.
-4. `tests/fixtures/audio-eval`: frozen manifest plus 20 Argentine Spanish audio files and SHA-256
-   hashes. Freeze the set before adjusting extraction rules.
+4. `tests/fixtures/audio-eval`: frozen manifest plus exactly 20 consented, non-sensitive Argentine
+   Spanish audio files and SHA-256 hashes. Freeze the files and manifest before implementing or
+   adjusting extraction rules.
 
 Run the slower audio gate explicitly:
 
@@ -180,8 +181,9 @@ npm run build
 3. Process a complete example and review every extracted field before confirmation.
 4. Process silence, ambiguous names and missing category. Each returns an editable incomplete
    proposal and creates no expense.
-5. Reject files over 15 MB or 60 seconds, unsupported formats and temporary transcription failure
-   without financial mutations; manual entry remains available.
+5. Accept WAV, MP3, M4A/MP4, WebM and Ogg. Reject any other container, files over 15 MB or 60
+   seconds, and temporary transcription failure without financial mutations; manual entry remains
+   available.
 6. Edit the proposal and confirm it through the normal expense creation flow. Exactly one expense
    is created from the final reviewed values.
 
@@ -192,11 +194,16 @@ zoom. Requirements pass only when there is no page-level horizontal scrolling, c
 inaccessible control. Also confirm:
 
 - visible labels and field-associated errors;
-- focus moves to the first invalid field after submission;
 - controls remain usable with the virtual keyboard open;
-- touch targets are at least 44 × 44 CSS pixels;
 - category bars have an equivalent textual category/amount list and do not rely on color alone;
 - recording tracks stop after completion or cancellation.
+
+### 9. Unassisted usability outcome
+
+Run the same protocol with exactly five representative users. Without assistance, each participant
+must attempt to register a shared expense, consult the monthly remaining amount and review an audio
+proposal. Record anonymous completion results per participant and per flow; SC-010 passes only when
+at least four of the five participants complete all three flows.
 
 ## Persistence and secret review
 
