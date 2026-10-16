@@ -23,12 +23,12 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 
 **Purpose**: Initialize the two-project repository and its deterministic local toolchain.
 
-- [ ] T001 Initialize the Python 3.12 backend with FastAPI, Pydantic, SQLAlchemy 2.x, PyJWT, `pwdlib[argon2]`, `faster-whisper`, pytest and httpx dependencies plus pytest markers `audio_eval` and `performance` in `backend/pyproject.toml`
-- [ ] T002 [P] Initialize the React JavaScript frontend with React, React DOM, React Router and Vite scripts for `dev` and `build` in `frontend/package.json`, `frontend/vite.config.js`, and `frontend/index.html`
-- [ ] T003 [P] Create backend package markers matching the planned modular structure under `backend/app/api/`, `backend/app/application/`, `backend/app/domain/`, `backend/app/db/`, `backend/app/infrastructure/`, and `backend/app/core/`
-- [ ] T004 [P] Create frontend entry points and feature directories under `frontend/src/app/`, `frontend/src/pages/`, `frontend/src/features/`, `frontend/src/components/`, `frontend/src/lib/`, and `frontend/src/styles/`
-- [ ] T005 [P] Document non-secret local configuration keys and safe defaults in `.env.example` without adding any credential values
-- [ ] T006 [P] Exclude `.env`, SQLite databases, temporary audio, private audio fixtures, Python/Node build artifacts and local model caches in `.gitignore`
+- [X] T001 Initialize the Python 3.12 backend with FastAPI, Pydantic, SQLAlchemy 2.x, PyJWT, `pwdlib[argon2]`, `faster-whisper`, pytest and httpx dependencies plus pytest markers `audio_eval` and `performance` in `backend/pyproject.toml`
+- [X] T002 [P] Initialize the React JavaScript frontend with React, React DOM, React Router and Vite scripts for `dev` and `build` in `frontend/package.json`, `frontend/vite.config.js`, and `frontend/index.html`
+- [X] T003 [P] Create backend package markers matching the planned modular structure under `backend/app/api/`, `backend/app/application/`, `backend/app/domain/`, `backend/app/db/`, `backend/app/infrastructure/`, and `backend/app/core/`
+- [X] T004 [P] Create frontend entry points and feature directories under `frontend/src/app/`, `frontend/src/pages/`, `frontend/src/features/`, `frontend/src/components/`, `frontend/src/lib/`, and `frontend/src/styles/`
+- [X] T005 [P] Document non-secret local configuration keys and safe defaults in `.env.example` without adding any credential values
+- [X] T006 [P] Exclude `.env`, SQLite databases, temporary audio, private audio fixtures, Python/Node build artifacts and local model caches in `.gitignore`
 
 **Checkpoint**: `uv sync` and `npm install` can materialize the declared projects without adding unapproved services or frameworks.
 
@@ -40,18 +40,18 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 
 **⚠️ CRITICAL**: No user story implementation starts until this phase is complete.
 
-- [ ] T007 [P] Implement validated environment settings for database, JWT, invitation, timezone, frontend origin, reset URL, email and local Whisper configuration in `backend/app/core/config.py`
-- [ ] T008 [P] Implement injectable UTC and `America/Argentina/Buenos_Aires` clocks for deterministic instants and omitted calendar dates in `backend/app/core/clock.py`
-- [ ] T009 Write failing file-backed SQLite integration tests for foreign-key enforcement, explicit rollback, WAL/busy-timeout configuration and persistence after engine recreation in `backend/tests/integration/test_database.py`
-- [ ] T010 Implement SQLAlchemy metadata, SQLite connection pragmas and request-scoped session/transaction lifecycle without repository commits in `backend/app/db/base.py` and `backend/app/db/session.py`
-- [ ] T011 Write failing unit tests for canonical two-decimal parsing, rejection of `float`, integer-cent conversion, formatting, addition and subtraction across positive, zero and negative results in `backend/tests/unit/test_money.py`
-- [ ] T012 Implement the exact Money boundary using string/Decimal parsing and integer-cent calculations only in `backend/app/domain/money.py`
-- [ ] T013 [P] Write failing API tests for the uniform `code/message/field_errors` error shape and non-disclosing unavailable-resource response in `backend/tests/api/test_errors.py`
-- [ ] T014 Implement domain exceptions and FastAPI exception mappings for validation, authentication, unavailable resources and stale versions in `backend/app/domain/errors.py` and `backend/app/api/dependencies.py`
-- [ ] T015 Define repository protocols and SQLAlchemy implementations that accept a session, scope board resource lookups by both resource ID and board ID, and never commit independently in `backend/app/infrastructure/repositories.py`
-- [ ] T016 [P] Implement credentialed native-fetch handling, uniform API errors and 401 session reset behavior in `frontend/src/lib/api.js`
-- [ ] T017 [P] Implement non-authoritative string/BigInt money input helpers and Argentina date/month formatting helpers in `frontend/src/lib/money.js` and `frontend/src/lib/dates.js`
-- [ ] T018 Build the FastAPI app factory, database-backed `/health`, correlation-ID structured logging with sensitive-body exclusion, React app shell, base router and mobile-first global styles in `backend/app/main.py`, `frontend/src/main.jsx`, `frontend/src/app/App.jsx`, `frontend/src/app/router.jsx`, and `frontend/src/styles/global.css`
+- [X] T007 [P] Implement validated environment settings for database, JWT, invitation, timezone, frontend origin, reset URL, email and local Whisper configuration in `backend/app/core/config.py`
+- [X] T008 [P] Implement injectable UTC and `America/Argentina/Buenos_Aires` clocks for deterministic instants and omitted calendar dates in `backend/app/core/clock.py`
+- [X] T009 Write failing file-backed SQLite integration tests for foreign-key enforcement, explicit rollback, WAL/busy-timeout configuration and persistence after engine recreation in `backend/tests/integration/test_database.py`
+- [X] T010 Implement SQLAlchemy metadata, SQLite connection pragmas and request-scoped session/transaction lifecycle without repository commits in `backend/app/db/base.py` and `backend/app/db/session.py`
+- [X] T011 Write failing unit tests for canonical two-decimal parsing, rejection of `float`, integer-cent conversion, formatting, addition and subtraction across positive, zero and negative results in `backend/tests/unit/test_money.py`
+- [X] T012 Implement the exact Money boundary using string/Decimal parsing and integer-cent calculations only in `backend/app/domain/money.py`
+- [X] T013 [P] Write failing API tests for the uniform `code/message/field_errors` error shape and non-disclosing unavailable-resource response in `backend/tests/api/test_errors.py`
+- [X] T014 Implement domain exceptions and FastAPI exception mappings for validation, authentication, unavailable resources and stale versions in `backend/app/domain/errors.py` and `backend/app/api/dependencies.py`
+- [X] T015 Define repository protocols and SQLAlchemy implementations that accept a session, scope board resource lookups by both resource ID and board ID, and never commit independently in `backend/app/infrastructure/repositories.py`
+- [X] T016 [P] Implement credentialed native-fetch handling, uniform API errors and 401 session reset behavior in `frontend/src/lib/api.js`
+- [X] T017 [P] Implement non-authoritative string/BigInt money input helpers and Argentina date/month formatting helpers in `frontend/src/lib/money.js` and `frontend/src/lib/dates.js`
+- [X] T018 Build the FastAPI app factory, database-backed `/health`, correlation-ID structured logging with sensitive-body exclusion, React app shell, base router and mobile-first global styles in `backend/app/main.py`, `frontend/src/main.jsx`, `frontend/src/app/App.jsx`, `frontend/src/app/router.jsx`, and `frontend/src/styles/global.css`
 
 **Checkpoint**: Foundation is ready; exact monetary primitives are green, the database transaction tests pass, and story work may begin.
 
@@ -65,23 +65,23 @@ description: "Dependency-ordered implementation tasks for Gestor de Gastos MVP"
 
 ### Tests for User Story 1 — write and observe failure first
 
-- [ ] T019 [P] [US1] Write failing unit tests for Argon2 password hashing, fixed-algorithm JWT claim validation, 30-minute expiry and raw-secret exclusion in `backend/tests/unit/test_security.py`
-- [ ] T020 [P] [US1] Write failing integration tests for unique normalized email, persisted/revoked AuthSession state and atomic one-time PasswordResetToken consumption in `backend/tests/integration/test_auth_persistence.py`
-- [ ] T021 [P] [US1] Write failing API contract tests for register, login, logout, `/auth/me`, enumeration-safe recovery, valid/expired/reused reset and cookie attributes in `backend/tests/api/test_auth.py`
+- [X] T019 [P] [US1] Write failing unit tests for Argon2 password hashing, fixed-algorithm JWT claim validation, 30-minute expiry and raw-secret exclusion in `backend/tests/unit/test_security.py`
+- [X] T020 [P] [US1] Write failing integration tests for unique normalized email, persisted/revoked AuthSession state and atomic one-time PasswordResetToken consumption in `backend/tests/integration/test_auth_persistence.py`
+- [X] T021 [P] [US1] Write failing API contract tests for register, login, logout, `/auth/me`, enumeration-safe recovery, valid/expired/reused reset and cookie attributes in `backend/tests/api/test_auth.py`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Map User (`id`: "Immutable primary key"; `display_name`: "Trimmed, 1–100 characters"; `email`: "Trimmed, normalized to lowercase for identity; globally unique"; `password_hash`: "Argon2 hash only; never returned"; `created_at`: "Set on registration"), AuthSession (`id / jti`: "Primary key and JWT jti"; `user_id`: "FK to User; indexed"; `issued_at`: "Matches JWT iat"; `expires_at`: "30 minutes after issue"; `revoked_at`: "Set by logout or password reset" when present) and PasswordResetToken (`id`: "Primary key"; `user_id`: "FK to User; indexed"; `token_digest`: "SHA-256 digest; unique; raw token never stored"; `created_at`: "Issue instant"; `expires_at`: "Exactly 30 minutes after issue"; `used_at`: "Set atomically on successful reset" when present) in `backend/app/db/models.py`
-- [ ] T023 [P] [US1] Implement Argon2 hashing, 30-minute HS256 JWT creation/verification with fixed issuer/audience/algorithm and secure random reset-token digesting in `backend/app/core/security.py`
-- [ ] T024 [P] [US1] Define auth request/response schemas with display-name 1–100, normalized valid email and password minimum 8 characters in `backend/app/api/schemas/auth.py`
-- [ ] T025 [P] [US1] Define the `EmailSender` port plus in-memory and TLS SMTP adapters that never log email, password or raw token content in `backend/app/infrastructure/email.py`
-- [ ] T026 [US1] Implement registration, login, session lookup/revocation, enumeration-safe recovery and atomic reset that revokes all sessions and unused tokens in `backend/app/application/auth_service.py`
-- [ ] T027 [US1] Implement `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me`, `/auth/password-recovery` and `/auth/password-reset` with HttpOnly SameSite=Lax cookies and Secure outside local development in `backend/app/api/routers/auth.py`
-- [ ] T028 [US1] Register the auth router and inject session, clock and email dependencies in `backend/app/main.py` and `backend/app/api/dependencies.py`
-- [ ] T029 [P] [US1] Implement the frontend auth API adapter without exposing JWTs to JavaScript in `frontend/src/features/auth/api.js`
-- [ ] T030 [P] [US1] Build labeled registration and login forms with field-associated errors in `frontend/src/features/auth/RegisterForm.jsx` and `frontend/src/features/auth/LoginForm.jsx`
-- [ ] T031 [P] [US1] Build enumeration-safe recovery and reset forms in `frontend/src/features/auth/RecoveryForm.jsx` and `frontend/src/features/auth/ResetPasswordForm.jsx`
-- [ ] T032 [US1] Implement authenticated-account context, protected routes, refresh-safe `/auth/me` loading and logout navigation in `frontend/src/features/auth/AuthContext.jsx`, `frontend/src/features/auth/ProtectedRoute.jsx`, and `frontend/src/app/router.jsx`
+- [X] T022 [US1] Map User (`id`: "Immutable primary key"; `display_name`: "Trimmed, 1–100 characters"; `email`: "Trimmed, normalized to lowercase for identity; globally unique"; `password_hash`: "Argon2 hash only; never returned"; `created_at`: "Set on registration"), AuthSession (`id / jti`: "Primary key and JWT jti"; `user_id`: "FK to User; indexed"; `issued_at`: "Matches JWT iat"; `expires_at`: "30 minutes after issue"; `revoked_at`: "Set by logout or password reset" when present) and PasswordResetToken (`id`: "Primary key"; `user_id`: "FK to User; indexed"; `token_digest`: "SHA-256 digest; unique; raw token never stored"; `created_at`: "Issue instant"; `expires_at`: "Exactly 30 minutes after issue"; `used_at`: "Set atomically on successful reset" when present) in `backend/app/db/models.py`
+- [X] T023 [P] [US1] Implement Argon2 hashing, 30-minute HS256 JWT creation/verification with fixed issuer/audience/algorithm and secure random reset-token digesting in `backend/app/core/security.py`
+- [X] T024 [P] [US1] Define auth request/response schemas with display-name 1–100, normalized valid email and password minimum 8 characters in `backend/app/api/schemas/auth.py`
+- [X] T025 [P] [US1] Define the `EmailSender` port plus in-memory and TLS SMTP adapters that never log email, password or raw token content in `backend/app/infrastructure/email.py`
+- [X] T026 [US1] Implement registration, login, session lookup/revocation, enumeration-safe recovery and atomic reset that revokes all sessions and unused tokens in `backend/app/application/auth_service.py`
+- [X] T027 [US1] Implement `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me`, `/auth/password-recovery` and `/auth/password-reset` with HttpOnly SameSite=Lax cookies and Secure outside local development in `backend/app/api/routers/auth.py`
+- [X] T028 [US1] Register the auth router and inject session, clock and email dependencies in `backend/app/main.py` and `backend/app/api/dependencies.py`
+- [X] T029 [P] [US1] Implement the frontend auth API adapter without exposing JWTs to JavaScript in `frontend/src/features/auth/api.js`
+- [X] T030 [P] [US1] Build labeled registration and login forms with field-associated errors in `frontend/src/features/auth/RegisterForm.jsx` and `frontend/src/features/auth/LoginForm.jsx`
+- [X] T031 [P] [US1] Build enumeration-safe recovery and reset forms in `frontend/src/features/auth/RecoveryForm.jsx` and `frontend/src/features/auth/ResetPasswordForm.jsx`
+- [X] T032 [US1] Implement authenticated-account context, protected routes, refresh-safe `/auth/me` loading and logout navigation in `frontend/src/features/auth/AuthContext.jsx`, `frontend/src/features/auth/ProtectedRoute.jsx`, and `frontend/src/app/router.jsx`
 
 **Checkpoint**: US1 passes independently and supplies authenticated identity to later stories.
 
